@@ -18,6 +18,7 @@ import com.devsuperior.dscatalog.dto.UserDTO;
 import com.devsuperior.dscatalog.dto.UserInsertDTO;
 import com.devsuperior.dscatalog.entities.Role;
 import com.devsuperior.dscatalog.entities.User;
+import com.devsuperior.dscatalog.repositories.RoleRepository;
 import com.devsuperior.dscatalog.repositories.UserRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -30,6 +31,9 @@ public class UserService {
 
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	private RoleRepository roleRepository;
 	
 	
 	@Transactional(readOnly = true)
@@ -85,10 +89,16 @@ public class UserService {
 		entity.setLastName(dto.getLastName());
 		entity.setEmail(dto.getEmail());
 	
-		//testei fazer um pouco diferente
+		//testei fazer um pouco diferente, mas desta forma não retorna as authorities
+//		entity.getRoles().clear();
+//		for (RoleDTO roleDto : dto.getRoles()) {
+//			entity.getRoles().add(new Role(roleDto.getId(),roleDto.getAuthority()));			
+//		}
+		
 		entity.getRoles().clear();
 		for (RoleDTO roleDto : dto.getRoles()) {
-			entity.getRoles().add(new Role(roleDto.getId(),roleDto.getAuthority()));			
+			Role role = roleRepository.getOne(roleDto.getId());
+			entity.getRoles().add(role);			
 		}
 	}	
 }
